@@ -9,5 +9,8 @@ auto is_other_clerk = query_server();
 auto is_cool = query_server(query_t = "is this cool?"s)();
 ...
 query_server(ip_t = "34.25.6.1");
-auto new_server_data = query_server(query_t = "hello new server"s);
+auto new_server_data = query_server(query_t = "hello new server"s)();
 ```
+
+with clerk you can talk to your functions!
+some of the features!
