@@ -14,18 +14,9 @@
  *
  */
 
-#include <concepts>
 #include <optional>
 #include <type_traits>
 
-/**
- * @brief the funman class.
- * this class holds a tuple of the arguments, and a pointer to a callable
- * object.
- *
- * @
- *
- */
 
 template <typename f, typename... Args>
 requires std::invocable<f, Args...>
@@ -54,7 +45,7 @@ struct funman {
   bool areAnyValid();
 
   template <typename new_f_t>
-  requires std::is_same_v<new_f_t, f>
+  requires std::is_invocable_v<new_f_t, Args...>
   void change_function(new_f_t new_func);
 
  private:
@@ -70,6 +61,16 @@ struct funman {
   template <std::size_t... I>
   bool areAllValid_impl(std::index_sequence<I...>);
 
+  template <std::size_t... I>
+  bool areAnyValid_impl(std::index_sequence<I...>);
+
  public:
   args_t const& args();
 };
+
+template<typename... Args>
+auto make_fun(auto f)
+{
+  return funman<decltype(f), Args...>(f);
+}
+

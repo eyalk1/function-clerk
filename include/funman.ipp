@@ -2,8 +2,6 @@
 
 #include "utility_templates.ipp"
 
-#include <concepts>
-#include <functional>
 #include <optional>
 #include <tuple>
 #include <type_traits>
@@ -87,10 +85,12 @@ bool funman<f, Args...>::areAnyValid() {
   return areAnyValid_impl(Indices());
 }
 
+
+
 template <typename f, typename... Args>
 requires std::invocable<f, Args...>
 template <typename new_f_t>
-requires std::is_same_v<new_f_t, f>
+requires std::is_invocable_v<new_f_t, Args...>
 void funman<f, Args...>::change_function(new_f_t new_func) {
   func_m = new_func;
 }
@@ -107,6 +107,13 @@ template <typename f, typename... Args>
 requires std::invocable<f, Args...>
 template <std::size_t... I>
 bool funman<f, Args...>::areAllValid_impl(std::index_sequence<I...>) {
+  return (isValid<typename std::tuple_element_t<I, args_t>::value_type>() && ...);
+}
+
+template <typename f, typename... Args>
+requires std::invocable<f, Args...>
+template <std::size_t... I>
+bool funman<f, Args...>::areAnyValid_impl(std::index_sequence<I...>) {
   return (isValid<typename std::tuple_element_t<I, args_t>::value_type>() || ...);
 }
 
