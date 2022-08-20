@@ -1,8 +1,11 @@
-#include <type_trait>
+#pragma once
+
+#include <type_traits>
 #include <tuple>
+#include <optional>
 
 /**
- * 
+ *
  */
 
 template<typename... T> struct is_tuple{
@@ -16,11 +19,10 @@ template<typename... T> struct is_tuple<std::tuple<T...>>{
 };
 
 template<typename... T>
-using is_tuple_v = is_tuple<T...>::value;
+using is_tuple_v = typename is_tuple<T...>::value;
 
 template<typename... T>
 concept tuple_c = is_tuple<T...>::val;
-
 
 template<typename... T> struct is_tuple_of_optionals{
 	using value = std::false_type;
@@ -33,10 +35,11 @@ template<typename... T> struct is_tuple_of_optionals<std::tuple<std::optional<T>
 };
 
 template<typename... T>
-using is_tuple_of_optionals_v = is_tuple_of_optionals<T...>::value;
+using is_tuple_of_optionals_v = typename is_tuple_of_optionals<T...>::value;
 
 template<typename... T>
 concept tuple_of_optionals_c = is_tuple<T...>::val;
+
 
 
 
@@ -50,13 +53,13 @@ consteval bool contains(){
 template<std::size_t... I>
 auto is_tuple_full(tuple_of_optionals_c auto const & tuple_to_check, std::index_sequence<I...>){
 	static_assert(is_tuple_v<std::decay_t<decltype(tuple_to_check)>>(), "not a tuple");
-	static_assert(is_tuple_of_optionalc_v<std::decay_t<decltype(tuple_to_check)>>(), "not a tuple of optionals");
+	static_assert(is_tuple_of_optionals_v<std::decay_t<decltype(tuple_to_check)>>(), "not a tuple of optionals");
 
 	return (std::get<I>(tuple_to_check).has_value() && ...);
 }
 
 
-template<typename target, typename headm typename... tail>
+template<typename target, typename head, typename... tail>
 consteval size_t get_t_index(){
 	static_assert(contains<target, head, tail...>(), "target is not in the typelist.");
 
@@ -69,7 +72,7 @@ consteval size_t get_t_index(){
 
 template<typename target, typename head, typename... tail>
 consteval unsigned int count_type(){
-	if constexpr (sizeof...(tail) -== 0)
+	if constexpr (sizeof...(tail) == 0)
 		return std::is_same_v<target, head>;
 	else
 		return std::is_same_v<target, head> + count_type<target, tail...>();
